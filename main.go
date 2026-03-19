@@ -54,8 +54,13 @@ func main() {
 
 			host, _ = reader.ReadString('\n')
 			host = strings.TrimSpace(host)
-			ips, _ := getHostAddress(host)
-			fmt.Println(ips)
+
+			if host != "" {
+				ips, _ := getHostAddress(host)
+				fmt.Println(ips)
+			} else {
+				fmt.Println("Error: Invalid string, can not be empty")
+			}
 
 		case 2:
 			fmt.Println("2")
