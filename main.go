@@ -9,8 +9,11 @@ import (
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
+
 	var modeChoice int
 	var host string
+
+	num := 0
 
 	const (
 		ColorGreen = "\033[32m"
@@ -34,27 +37,35 @@ func main() {
 	fmt.Println(ColorGreen + underLine + ColorReset)
 	fmt.Println("V1.0.0 - Starting Viper Engine...")
 
-	fmt.Println("Modes of Operations")
-	fmt.Println("1. DNS - Get Host Address:")
-	fmt.Println("2. Port Scan - Single")
-	fmt.Println("3. Port Scan - Wide")
-	fmt.Print("Select mode: ")
-	fmt.Scan(&modeChoice)
+	for num < 1 {
+		fmt.Println("Modes of Operations")
+		fmt.Println("1. DNS - Get Host Address:")
+		fmt.Println("2. Port Scan - Single")
+		fmt.Println("3. Port Scan - Wide")
+		fmt.Println("4. Quit")
+		fmt.Print("Select mode: ")
+		fmt.Scan(&modeChoice)
 
-	fmt.Println(modeChoice)
+		fmt.Println(modeChoice)
 
-	switch modeChoice {
-	case 1:
-		fmt.Print("Enter host: ")
+		switch modeChoice {
+		case 1:
+			fmt.Print("Enter host: ")
 
-		host, _ = reader.ReadString('\n')
-		host = strings.TrimSpace(host)
-		ips, _ := getHostAddress(host)
-		fmt.Println(ips)
+			host, _ = reader.ReadString('\n')
+			host = strings.TrimSpace(host)
+			ips, _ := getHostAddress(host)
+			fmt.Println(ips)
 
-	case 2:
-		fmt.Println("2")
-	case 3:
-		fmt.Println("3")
+		case 2:
+			fmt.Println("2")
+		case 3:
+			fmt.Println("3")
+		case 4:
+			num += 1
+			fmt.Println("Quiting Viper...")
+		}
+
 	}
+
 }
