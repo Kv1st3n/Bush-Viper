@@ -13,6 +13,9 @@ func main() {
 	var modeChoice int
 	var host string
 
+	var ip string
+	var port string
+
 	num := 0
 
 	const (
@@ -64,6 +67,22 @@ func main() {
 
 		case 2:
 			fmt.Println("2")
+
+			fmt.Print("Enter IP-Address: ")
+			fmt.Scan(&ip)
+
+			fmt.Print("Enter specific port: ")
+			fmt.Scan(&port)
+
+			fmt.Printf("Scanning %s:%s...\n", ip, port) // Feedback for the user
+			res, err := singlePortScan(ip, port)
+
+			if err != nil {
+				fmt.Printf("[-] Port %s is CLOSED (Error: %v)\n", port, err)
+			} else {
+				fmt.Printf("[+] Success! %s:%s is %v\n", res.IP, res.Port, res.Opened)
+			}
+
 		case 3:
 			fmt.Println("3")
 		case 4:
