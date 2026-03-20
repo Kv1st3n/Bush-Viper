@@ -1,22 +1,19 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"strings"
 )
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
 
-	var modeChoice int
-	var host string
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: bush-viper <mode> <ip> <port/prefix>")
+		fmt.Println("Modes: 1 (DNS), 2 (Single), 3 (Wide/Rust)")
+		return
+	}
 
-	var ip string
-	var port string
-
-	num := 0
+	modeChoice := os.Args[1]
 
 	const (
 		ColorGreen = "\033[32m"
@@ -40,56 +37,37 @@ func main() {
 	fmt.Println(ColorGreen + underLine + ColorReset)
 	fmt.Println("V1.0.0 - Starting Viper Engine...")
 
-	for num < 1 {
-		fmt.Println("Modes of Operations")
-		fmt.Println("1. DNS - Get Host Address:")
-		fmt.Println("2. Port Scan - Single")
-		fmt.Println("3. Port Scan - Wide")
-		fmt.Println("4. Quit")
-		fmt.Print("Select mode: ")
-		fmt.Scan(&modeChoice)
+	switch modeChoice {
+	case "1":
 
-		fmt.Println(modeChoice)
+		if len(os.Args) < 3 {
+			fmt.Println("Error: Mode 1 requires a hostname. Example: ./bush-viper 1 google.com")
+			return
+		}
+		host := os.Args[2]
+		ipAddress, _ := getHostAddress(host)
+		fmt.Printf("DNS result for %s: %v\n", host, ipAddress)
 
-		switch modeChoice {
-		case 1:
-			fmt.Print("Enter host: ")
+	case "2":
 
-			host, _ = reader.ReadString('\n')
-			host = strings.TrimSpace(host)
-
-			if host != "" {
-				ips, _ := getHostAddress(host)
-				fmt.Println(ips)
-			} else {
-				fmt.Println("Error: Invalid string, can not be empty")
-			}
-
-		case 2:
-			fmt.Println("2")
-
-			fmt.Print("Enter IP-Address: ")
-			fmt.Scan(&ip)
-
-			fmt.Print("Enter specific port: ")
-			fmt.Scan(&port)
-
-			fmt.Printf("Scanning %s:%s...\n", ip, port) // Feedback for the user
-			res, err := singlePortScan(ip, port)
-
-			if err != nil {
-				fmt.Printf("[-] Port %s is CLOSED (Error: %v)\n", port, err)
-			} else {
-				fmt.Printf("[+] Success! %s:%s is %v\n", res.IP, res.Port, res.Opened)
-			}
-
-		case 3:
-			fmt.Println("3")
-		case 4:
-			num += 1
-			fmt.Println("Quiting Viper...")
+		if len(os.Args) < 4 {
+			fmt.Println("Error: Mode 2 requires IP and Port. Example: ./bush-viper 2 127.0.0.1 80")
 		}
 
+		ip := os.Args[2]
+		port := os.Args[3]
+
+		result, err := singlePortScan(ip, port)
+		if err != nil {
+			fmt.Printf("[-] %s:%s is CLOSED\n", ip, port)
+		} else {
+			fmt.Printf("[+] %s:%s is OPEN!\n", result.IP, result.Port)
+		}
+
+	case "3":
+		fmt.Println("3")
+	case "4":
+		fmt.Println("Quiting Viper...")
 	}
 
 }
