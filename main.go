@@ -65,7 +65,31 @@ func main() {
 		}
 
 	case "3":
-		fmt.Println("3")
+
+		if len(os.Args) < 3 {
+			fmt.Println("Error: Mode 3 requires IP. Example: ./bush-viper 3 127.0.0.1")
+			return
+		}
+
+		ip := os.Args[2]
+		fmt.Printf("[*] Starting wide port scan on %s (Ports 1-5000)...\n", ip)
+
+		results, err := widePortScan(ip)
+		if err != nil {
+			fmt.Printf("[-] Error during wide scan: %v\n", err)
+			return
+		}
+
+		if len(results) == 0 {
+			fmt.Println("[-] No open ports found in the specified range.")
+		} else {
+			fmt.Printf("[+] Found %d open ports:\n", len(results))
+
+			for _, res := range results {
+				fmt.Printf("    - Port %s: %s\n", res.Port, res.Opened)
+			}
+		}
+
 	case "4":
 		fmt.Println("Quiting Viper...")
 	}
