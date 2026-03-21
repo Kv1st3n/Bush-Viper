@@ -58,5 +58,5 @@ go run . 3 127.0.0.1
 
 ```
 
->[!DISCLAIMER]
+>[!WARNING]
 >This tool is for educational and authorized testing purposes only. Do not use it on targets that you do not own or have explicit permission to scan.
