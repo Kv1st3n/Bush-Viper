@@ -3,6 +3,7 @@ package main
 import (
 	"net"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -33,29 +34,46 @@ func singlePortScan(address string, port string) (ScanResult, error) {
 
 func widePortScan(address string) ([]ScanResult, error) {
 
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	var semGroup = make(chan struct{}, 100)
+
 	var results []ScanResult
 
-	// 5000 for now, will use goroutines later
+	// 5000 for now
 	for startPort := 1; startPort <= 5000; startPort++ {
+		wg.Add(1)
+		semGroup <- struct{}{}
 
-		port := strconv.Itoa(startPort)
+		go func(id int) {
+			defer wg.Done()
+			defer func() {
+				<-semGroup
+			}()
 
-		target := net.JoinHostPort(address, port)
+			port := strconv.Itoa(startPort)
 
-		conn, err := net.DialTimeout("tcp", target, 400*time.Millisecond)
-		if err != nil {
-			continue
-		}
-		defer conn.Close()
+			target := net.JoinHostPort(address, port)
 
-		results = append(results, ScanResult{
-			IP:     address,
-			Port:   port,
-			Opened: "Opened",
-		})
+			conn, err := net.DialTimeout("tcp", target, 400*time.Millisecond)
+			if err != nil {
+				return
+			}
+			defer conn.Close()
+
+			mu.Lock()
+			results = append(results, ScanResult{
+				IP:     address,
+				Port:   port,
+				Opened: "Opened",
+			})
+			mu.Unlock()
+
+		}(startPort)
 
 	}
 
+	wg.Wait()
 	return results, nil
 
 }
