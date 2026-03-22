@@ -40,8 +40,7 @@ func widePortScan(address string) ([]ScanResult, error) {
 
 	var results []ScanResult
 
-	// 5000 for now
-	for startPort := 1; startPort <= 5000; startPort++ {
+	for startPort := 1; startPort <= 65536; startPort++ {
 		wg.Add(1)
 		semGroup <- struct{}{}
 
