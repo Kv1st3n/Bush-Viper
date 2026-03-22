@@ -2,7 +2,7 @@
 Bush-Viper is a simple CLI-based port scanner built in Golang. It was developed (and is still being developed) to explore networking. Currently, it provides tools for DNS lookup and port scanning (both single-port or wide-range)
 
 >[!IMPORTANT]
-> This is an early build, with sequential scanning. 
+> This is an early build. 
 >Expect updates for improvement in functionality and performance.
 
 ## Installing
