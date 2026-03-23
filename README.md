@@ -24,7 +24,7 @@ To run bush-viper use 'go run .' once in the directory, there are three availabl
 
 ```
 1 = DNS lookup
-2 = singl-port scan
+2 = single-port scan
 3 = wide-range scan
 ```
 
