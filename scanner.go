@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"strconv"
 	"sync"
@@ -101,16 +100,18 @@ func grabBanner(conn net.Conn, port int) (string, error) {
 
 	// if service does not talk
 	// check if a service exists based on the targeted port, e.g. HTTP for their probe
-	service, exists := ServiceDB[port]
-	if !exists || len(service.Probe) == 0 {
-		return "", fmt.Errorf("no probe for port %d", port)
+	if !isPortInBanner(port) {
+		return "", nil
 	}
 
 	// formulate a new probe based on the service
+	service := ServiceDB[port]
 	_, err = conn.Write(service.Probe)
 	if err != nil {
 		return "", err
 	}
+
+	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 
 	// read the response
 	n, err = conn.Read(buffer)
@@ -122,6 +123,7 @@ func grabBanner(conn net.Conn, port int) (string, error) {
 
 }
 
+// checks if the targeted port is in the db, and if it has some form of probe
 func isPortInBanner(currentPort int) bool {
 
 	service, exists := ServiceDB[currentPort]
