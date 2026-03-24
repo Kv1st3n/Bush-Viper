@@ -58,10 +58,16 @@ func main() {
 		port := os.Args[3]
 
 		result, err := singlePortScan(ip, port)
-		if err != nil {
-			fmt.Printf("[-] %s:%s is CLOSED\n", ip, port)
+		if err != nil || result.Opened == "" {
+			fmt.Printf("[-] %s:%s is CLOSED or Unreachable\n", ip, port)
 		} else {
 			fmt.Printf("[+] %s:%s is OPEN!\n", result.IP, result.Port)
+
+			if result.Banner != "" {
+				fmt.Printf("    Banner: %q\n", result.Banner)
+			} else {
+				fmt.Println("    Banner: <No response or no probe matches>")
+			}
 		}
 
 	case "3":
@@ -72,7 +78,7 @@ func main() {
 		}
 
 		ip := os.Args[2]
-		fmt.Printf("[*] Starting wide port scan on %s (Ports 1-5000)...\n", ip)
+		fmt.Printf("[*] Starting wide port scan on %s (Ports 1-65536)...\n", ip)
 
 		results, err := widePortScan(ip)
 		if err != nil {
@@ -86,7 +92,11 @@ func main() {
 			fmt.Printf("[+] Found %d open ports:\n", len(results))
 
 			for _, res := range results {
-				fmt.Printf("    - Port %s: %s\n", res.Port, res.Opened)
+				if res.Banner != "" {
+					fmt.Printf("    - Port %-5s: %-7s | Banner: %q\n", res.Port, res.Opened, res.Banner)
+				} else {
+					fmt.Printf("    - Port %-5s: %-7s | No banner captured\n", res.Port, res.Opened)
+				}
 			}
 		}
 
