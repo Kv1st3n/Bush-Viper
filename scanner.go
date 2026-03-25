@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"strconv"
 	"sync"
@@ -38,15 +39,30 @@ func singlePortScan(address string, port string) (ScanResult, error) {
 
 }
 
-func widePortScan(address string) ([]ScanResult, error) {
+func widePortScan(address string, start string, end string) ([]ScanResult, error) {
+
+	// convert startP to int
+	startP, err := strconv.Atoi(start)
+	if err != nil {
+		return nil, fmt.Errorf("invalid start port '%s': %w", start, err)
+	}
+
+	// convert startP to int
+	endP, err := strconv.Atoi(end)
+	if err != nil {
+		return nil, fmt.Errorf("invalid end port '%s': %w", end, err)
+	}
+
+	if startP > endP {
+		return nil, fmt.Errorf("start port (%d) cannot be greater than end port (%d)", startP, endP)
+	}
 
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	var semGroup = make(chan struct{}, 100)
-
 	var results []ScanResult
 
-	for startPort := 1; startPort <= 65536; startPort++ {
+	for startPort := startP; startPort <= endP; startPort++ {
 		wg.Add(1)
 		semGroup <- struct{}{}
 

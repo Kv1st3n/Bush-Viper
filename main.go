@@ -9,7 +9,7 @@ func main() {
 
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: bush-viper <mode> <ip> <port/prefix>")
-		fmt.Println("Modes: 1 (DNS), 2 (Single), 3 (Wide/Rust)")
+		fmt.Println("Modes: 1 (DNS), 2 (Single), 3 (Wide/Rust), 4 (Manual)")
 		return
 	}
 
@@ -71,16 +71,26 @@ func main() {
 		}
 
 	case "3":
+		var startPort string = "1"
+		var endPort string = "65536"
 
 		if len(os.Args) < 3 {
 			fmt.Println("Error: Mode 3 requires IP. Example: ./bush-viper 3 127.0.0.1")
 			return
 		}
-
 		ip := os.Args[2]
-		fmt.Printf("[*] Starting wide port scan on %s (Ports 1-65536)...\n", ip)
 
-		results, err := widePortScan(ip)
+		if len(os.Args) >= 4 {
+			startPort = os.Args[3]
+		}
+
+		if len(os.Args) >= 5 {
+			endPort = os.Args[4]
+		}
+
+		fmt.Printf("[*] Starting wide port scan on %s (Ports %s-%s)...\n", ip, startPort, endPort)
+
+		results, err := widePortScan(ip, startPort, endPort)
 		if err != nil {
 			fmt.Printf("[-] Error during wide scan: %v\n", err)
 			return
@@ -101,7 +111,7 @@ func main() {
 		}
 
 	case "4":
-		fmt.Println("Quiting Viper...")
+		fmt.Println("Manual")
 	}
 
 }
