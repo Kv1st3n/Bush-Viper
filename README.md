@@ -49,8 +49,8 @@ go run . 2 127.0.0.1 80
 
 ```
 
-**Mode 3 defaults to ports 1-65535 if only the IP-address is provided but you can optionally specify a custom range**
 ### Using wide-range scan
+**Mode 3 defaults to ports 1-65535 if only the IP-address is provided but you can optionally specify a custom range**
 ``` 
 # Basic Command (Default)
 go run . <mode> <IP>
