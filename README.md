@@ -26,6 +26,7 @@ To run bush-viper use 'go run .' once in the directory, there are three availabl
 1 = DNS lookup
 2 = single-port scan
 3 = wide-range scan
+4 = Manual (W.I.P.)
 ```
 
 ### Using DNS lookup
@@ -41,7 +42,7 @@ go run . 1 example.com
 ### Using single-port scan
 ``` 
 # Command
-go run . <mode> <hostname> <port>
+go run . <mode> <IP> <port>
 
 # Example
 go run . 2 127.0.0.1 80
@@ -50,11 +51,15 @@ go run . 2 127.0.0.1 80
 
 ### Using wide-range scan
 ``` 
-# Command
-go run . <mode> <hostname>
+**Mode 3 defaults to ports 1-65535 if only the IP-address is provided but you can optionally specify a custom range**
+# Basic Command (Default)
+go run . <mode> <IP>
 
 # Example
 go run . 3 127.0.0.1
+
+# Custom Range Command (Scans only ports 80 through 443)
+go run . 3 127.0.0.1 80 443
 
 ```
 
