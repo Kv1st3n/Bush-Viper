@@ -7,10 +7,10 @@ Bush-Viper is a simple CLI-based port scanner built in Golang. It was developed 
 
 ## Installing
 
-Prerequisites
+### Prerequisites
 - You must have Golang installed
 
-``` 
+```bash
 # Clone the Git
 git clone https://github.com/Kv1st3n/Bush-Viper.git
 
@@ -20,46 +20,52 @@ cd bush-viper
 ```
 
 ## Using Bush-Viper
-To run bush-viper use 'go run .' once in the directory, there are three available modes: DNS, single-port, and wide-range scans
+Bush-Viper uses flags for configuration. This means you use specific keys like `-mode` or `ip` to pass your arguments. To see all available flags run:
+
 
 ```
+# Help
+go run . -help
+
+# Available modes
 1 = DNS lookup
 2 = single-port scan
 3 = wide-range scan
-4 = Manual (W.I.P.)
 ```
 
 ### Using DNS lookup
+Pass the target hostname to the `-ip` flag.
 ``` 
 # Command
-go run . <mode> <hostname>
+go run . -mode 1 -ip <hostname>
 
 # Example
-go run . 1 example.com
+go run . -mode 1 -ip example.com
 
 ```
 
 ### Using single-port scan
+Specify the target IP and a single port.
 ``` 
 # Command
-go run . <mode> <IP> <port>
+go run . -mode 2 -ip <IP> -port <port>
 
 # Example
-go run . 2 127.0.0.1 80
+go run . -mode 2 -ip 127.0.0.1 -port 80
 
 ```
 
 ### Using wide-range scan
-**Mode 3 defaults to ports 1-65535 if only the IP-address is provided but you can optionally specify a custom range**
+**Mode 3 defaults to ports 1-65535 if only the IP-address is provided but you can optionally specify a custom range using a hyphen**
 ``` 
 # Basic Command (Default)
-go run . <mode> <IP>
+go run . -mode 3 -ip <IP>
 
 # Example
-go run . 3 127.0.0.1
+go run . -mode 3 -ip 127.0.0.1
 
 # Custom Range Command (Scans only ports 80 through 443)
-go run . 3 127.0.0.1 80 443
+go run . -mode 3 -ip 127.0.0.1 -port 80-443
 
 ```
 
