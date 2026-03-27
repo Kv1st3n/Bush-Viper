@@ -89,8 +89,6 @@ func main() {
 			}
 		}
 
-	case 4:
-		fmt.Println("Manual")
 	default:
 		fmt.Printf("Unknown mode: %d. Use -help for usage.\n", *mode)
 	}
