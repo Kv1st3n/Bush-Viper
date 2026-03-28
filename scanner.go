@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// to hold data for successful port connection
 type ScanResult struct {
 	IP     string
 	Port   string
@@ -28,6 +29,7 @@ func singlePortScan(address string, port string) (ScanResult, error) {
 
 	portInt, _ := strconv.Atoi(port)
 
+	// port is open, check if there is a banner probe for it
 	banner, _ := grabBanner(conn, portInt)
 
 	return ScanResult{
@@ -37,6 +39,31 @@ func singlePortScan(address string, port string) (ScanResult, error) {
 		Banner: banner,
 	}, nil
 
+}
+
+func portWorkerPool(adress string, ports <-chan int, results chan<- ScanResult, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for p := range ports {
+		portStr := strconv.Itoa(p)
+		targetAdress := net.JoinHostPort(adress, portStr)
+
+		conn, err := net.DialTimeout("tcp", targetAdress, 400*time.Millisecond)
+		if err != nil {
+			continue
+		}
+		// port is open, check if there is a banner probe for it
+		banner, _ := grabBanner(conn, p)
+		conn.Close()
+
+		results <- ScanResult{
+			IP:     adress,
+			Port:   portStr,
+			Opened: "Opened",
+			Banner: banner,
+		}
+
+	}
 }
 
 func widePortScan(address string, start string, end string) ([]ScanResult, error) {
@@ -53,52 +80,39 @@ func widePortScan(address string, start string, end string) ([]ScanResult, error
 		return nil, fmt.Errorf("invalid end port '%s': %w", end, err)
 	}
 
+	// ensure that the startp is smaller than the endport for the range
 	if startP > endP {
 		return nil, fmt.Errorf("start port (%d) cannot be greater than end port (%d)", startP, endP)
 	}
 
-	var mu sync.Mutex
+	portQueue := make(chan int, 100)
+	resultChan := make(chan ScanResult, 100)
+
 	var wg sync.WaitGroup
-	var semGroup = make(chan struct{}, 100)
-	var results []ScanResult
+	const portWorkerCount = 100
 
-	for startPort := startP; startPort <= endP; startPort++ {
+	for i := 0; i < portWorkerCount; i++ {
 		wg.Add(1)
-		semGroup <- struct{}{}
-
-		go func(id int) {
-			defer wg.Done()
-			defer func() {
-				<-semGroup
-			}()
-
-			port := strconv.Itoa(startPort)
-
-			target := net.JoinHostPort(address, port)
-
-			conn, err := net.DialTimeout("tcp", target, 400*time.Millisecond)
-			if err != nil {
-				return
-			}
-
-			banner, _ := grabBanner(conn, id)
-
-			conn.Close()
-
-			mu.Lock()
-			results = append(results, ScanResult{
-				IP:     address,
-				Port:   port,
-				Opened: "Opened",
-				Banner: banner,
-			})
-			mu.Unlock()
-
-		}(startPort)
-
+		go portWorkerPool(address, portQueue, resultChan, &wg)
 	}
 
-	wg.Wait()
+	go func() {
+		for p := startP; p <= endP; p++ {
+			portQueue <- p
+		}
+		close(portQueue)
+	}()
+
+	go func() {
+		wg.Wait()
+		close(resultChan)
+	}()
+
+	var results []ScanResult
+	for res := range resultChan {
+		results = append(results, res)
+	}
+
 	return results, nil
 
 }
