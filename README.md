@@ -10,7 +10,7 @@ Bush-Viper is a simple CLI-based port scanner built in Golang. It was developed 
 ### Prerequisites
 - You must have Golang installed
 
-```bash
+```zsh
 # Clone the Git
 git clone https://github.com/Kv1st3n/Bush-Viper.git
 
@@ -35,7 +35,7 @@ go run . -help
 
 ### Using DNS lookup
 Pass the target hostname to the `-ip` flag.
-``` 
+```zsh 
 # Command
 go run . -mode 1 -ip <hostname>
 
@@ -46,7 +46,7 @@ go run . -mode 1 -ip example.com
 
 ### Using single-port scan
 Specify the target IP and a single port.
-``` 
+```zsh
 # Command
 go run . -mode 2 -ip <IP> -port <port>
 
@@ -57,7 +57,7 @@ go run . -mode 2 -ip 127.0.0.1 -port 80
 
 ### Using wide-range scan
 **Mode 3 defaults to ports 1-65535 if only the IP-address is provided but you can optionally specify a custom range using a hyphen**
-``` 
+```zsh
 # Basic Command (Default)
 go run . -mode 3 -ip <IP>
 
